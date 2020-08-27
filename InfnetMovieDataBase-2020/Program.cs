@@ -1,0 +1,120 @@
+﻿using Dominio;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+
+namespace InfnetMovieDataBase_2020
+{
+    class Program
+    {
+        static List<Filme> filmes = new List<Filme>(); // Lista global de filmes. 
+
+        static void Main(string[] args)
+        {
+            Povoar();
+
+            while (true)
+            {
+                //CadastrarFilme();
+                Console.Write("Digite 'N' para encerrar o cadastro; Enter ou outra tecla para cadastrar outro filme: ");
+                var opcao = Console.ReadLine();
+                if (opcao.ToLower() == "n".ToLower())
+                {
+                    break;
+                }
+            }
+
+            foreach (var filme in filmes)
+            {
+                // Imprimir os dados do filme: 
+                Console.WriteLine($"Título: {filme.Titulo}");
+                Console.WriteLine($"Título Original: {filme.TituloOriginal}");
+                Console.WriteLine("Elenco:");
+                foreach (var pessoa in filme.Elenco)
+                {
+                    Console.WriteLine($"\t— {pessoa.Nome} {pessoa.Sobrenome}");
+                }
+            }
+        }
+
+        private static void Povoar()
+        {
+            Filme f1 = new Filme("Os Vingadores", "The Avengers") { AnoLancamento = 2012, Sinopse = "Vingadores dão um pau no Loki." };
+            f1.Elenco.Add(new Pessoa("Robert", "Downey Jr."));
+            f1.Elenco.Add(new Pessoa("Chris", "Evans"));
+            f1.Elenco.Add(new Pessoa("Mark", "Ruffalo"));
+            f1.Elenco.Add(new Pessoa("Scarlett", "Johansson"));
+            f1.Elenco.Add(new Pessoa("Chris", "Hemsworth"));
+            f1.Elenco.Add(new Pessoa("Jeremy", "Renner"));
+            filmes.Add(f1);
+
+            Filme f2 = new Filme("Homem de Ferro 2", "Iron Man 2") { AnoLancamento = 2009, Sinopse = "Homem de Ferro contra o grandão de chicote." };
+            f2.Elenco.Add(new Pessoa("Robert", "Downey Jr."));
+            f2.Elenco.Add(new Pessoa("Scarlett", "Johansson"));
+            filmes.Add(f2);
+
+            Filme f3 = new Filme("Capitão América 2: Soldado Invernal", "Captain America 2: Winter Soldier") { AnoLancamento = 2010 };
+            f3.Elenco.Add(new Pessoa("Chris", "Evans"));
+            f3.Elenco.Add(new Pessoa("Scarlett", "Johansson"));
+            filmes.Add(f3);
+        }
+
+        static void CadastrarFilme()
+        {
+            //1. Informar ao usuário que ele deve informar o título do filme.
+            Console.Write("Informe o título do filme: ");
+            //2. Fornecer o campo de input do nome do filme ao usuário.
+            var titulo = Console.ReadLine();
+            Console.Write("Informe o título original do filme: ");
+            var tituloOriginal = Console.ReadLine();
+            Console.Write("Informe a data de lançamento do filme: ");
+            var data = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy", new CultureInfo("pt-BR"));
+            //Console.Write("Informe o ano de lançamento do filme: ");
+            //var ano = Int32.Parse(Console.ReadLine()); // Int32.Parse para já converter a string de entrada em um int.
+            var ano = data.Year;
+            // Repetir os passos 1 e 2 para outros campos simples (título original, ano lançamento)
+            // Instanciar um objeto do tipo filme e atribuir os inputs do usuário ao objeto.
+            Filme filme = new Filme(titulo, tituloOriginal)
+            {
+                AnoLancamento = ano,
+                DataLancamento = data
+            };
+                        
+            // Cadastrar o elenco do filme:
+            while (true)
+            {
+                filme.Elenco.Add(CadastrarIntegranteElenco());
+                Console.WriteLine("Digite 'N' para encerrar o cadastro; Enter ou outra tecla para cadastrar outro(a) ator/atriz: ");
+                var opcao = Console.ReadLine();
+                if (opcao.ToLower() == "n".ToLower())
+                {
+                    break;
+                }
+            }
+
+            // Adicionar este filme à lista de filmes global. 
+            filmes.Add(filme);
+        }
+
+        static Pessoa CadastrarIntegranteElenco()
+        {
+            var nome = "";
+            var sobrenome = "";
+
+            while (nome == "" || sobrenome == "")
+            {
+                Console.WriteLine("Informe o nome do(a) ator/atriz: ");
+                nome = Console.ReadLine();
+                Console.WriteLine("Informe o sobrenome do(a) ator/atriz: ");
+                sobrenome = Console.ReadLine();
+                if (nome == "" || sobrenome == "")
+                {
+                    Console.WriteLine("Dados inválidos.");
+                }
+            }
+
+            Pessoa p = new Pessoa(nome, sobrenome);
+            return p;
+        }
+    }
+}
