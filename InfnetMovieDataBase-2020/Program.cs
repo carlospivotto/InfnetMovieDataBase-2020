@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace InfnetMovieDataBase_2020
 {
@@ -12,19 +13,53 @@ namespace InfnetMovieDataBase_2020
         static void Main(string[] args)
         {
             Povoar();
-
+            IEnumerable<Filme> resultados;
             while (true)
             {
-                //CadastrarFilme();
-                Console.Write("Digite 'N' para encerrar o cadastro; Enter ou outra tecla para cadastrar outro filme: ");
-                var opcao = Console.ReadLine();
-                if (opcao.ToLower() == "n".ToLower())
+                Console.WriteLine("(1) Cadastrar filme");
+                Console.WriteLine("(2) Buscar filme");
+                Console.WriteLine("(3) Buscar filmografia");
+                Console.Write("Selecione a opção desejada: ");
+                var opcao = Int32.Parse(Console.ReadLine());
+
+                switch (opcao)
                 {
-                    break;
+                    case 1:
+                        CadastrarFilme();
+                        break;
+                    case 2:
+                        Console.WriteLine("Informe o título de um filme:");
+                        var titulo = Console.ReadLine();
+                        resultados = BuscarFilme(titulo);
+                        foreach (var filme in resultados)
+                        {
+                            // Imprimir os dados do filme: 
+                            Console.WriteLine($"Título: {filme.Titulo}");
+                            Console.WriteLine($"Título Original: {filme.TituloOriginal}");
+                            Console.WriteLine("Elenco:");
+                            foreach (var pessoa in filme.Elenco)
+                            {
+                                Console.WriteLine($"\t— {pessoa.Nome} {pessoa.Sobrenome}");
+                            }
+                        }
+                        break;
+                    case 3:
+                        Console.WriteLine("Informe o nome de um(a) ator/atriz:");
+                        var nome = Console.ReadLine();
+                        Console.WriteLine("Informe o sobrenome de um(a) ator/atriz:");
+                        var sobrenome = Console.ReadLine();
+                        Pessoa p = new Pessoa(nome, sobrenome);
+                        resultados = BuscarFilmografia(p);
+                        ImprimirResultados(resultados);
+                        break;
                 }
             }
 
-            foreach (var filme in filmes)
+        }
+
+        private static void ImprimirResultados(IEnumerable<Filme> resultados)
+        {
+            foreach (var filme in resultados)
             {
                 // Imprimir os dados do filme: 
                 Console.WriteLine($"Título: {filme.Titulo}");
@@ -35,6 +70,26 @@ namespace InfnetMovieDataBase_2020
                     Console.WriteLine($"\t— {pessoa.Nome} {pessoa.Sobrenome}");
                 }
             }
+        }
+
+        private static IEnumerable<Filme> BuscarFilmografia(Pessoa p)
+        {
+            var resultado = from filme in filmes
+                            from pessoa in filme.Elenco
+                            where pessoa.Nome == p.Nome && pessoa.Sobrenome == p.Sobrenome
+                            select filme;
+
+            return resultado;
+        }
+
+
+        private static IEnumerable<Filme> BuscarFilme(string titulo)
+        {
+            var resultado = from filme in filmes
+                            where filme.Titulo == titulo
+                            select filme;
+
+            return resultado;
         }
 
         private static void Povoar()
@@ -79,7 +134,7 @@ namespace InfnetMovieDataBase_2020
                 AnoLancamento = ano,
                 DataLancamento = data
             };
-                        
+
             // Cadastrar o elenco do filme:
             while (true)
             {
